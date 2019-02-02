@@ -1,0 +1,6 @@
+# ==================================
+# Options for ttnlogger systemd unit
+# ==================================
+
+TTN_APP_ID="{app_id}"
+TTN_ACCESS_KEY="{access_key}"

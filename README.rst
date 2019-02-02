@@ -3,14 +3,25 @@ ttnlogger
 #########
 
 
+*****
 About
-=====
+*****
 TTN data logger made with FiPy_, MQTT_, InfluxDB_ and Grafana_.
 
 
+********
 Synopsis
-========
+********
 
+Interactive
+-----------
+::
+
+    ttnlogger "{app_id}" "{access_key}"
+
+
+w/o arguments
+-------------
 ::
 
     export TTN_APP_ID="{app_id}"
@@ -19,9 +30,20 @@ Synopsis
     ttnlogger
 
 
-::
+*****
+Setup
+*****
 
-    ttnlogger "{app_id}" "{access_key}"
+Run as systemd unit::
+
+    ln -sr etc/default/ttnlogger /etc/default/
+    ln -sr etc/systemd/ttnlogger.service /usr/lib/systemd/system/
+
+    systemctl enable ttnlogger
+    systemctl start ttnlogger
+    systemctl status ttnlogger
+    journalctl -f ttnlogger
+
 
 
 .. _FiPy: https://pycom.io/product/fipy/

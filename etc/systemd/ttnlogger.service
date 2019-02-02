@@ -1,0 +1,19 @@
+[Unit]
+Description=ttnlogger - converge TTN messages into InfluxDB and MongoDB.
+Documentation=https://github.com/daq-tools/ttnlogger
+After=network.target
+
+[Service]
+User=daemon
+Group=daemon
+LimitNOFILE=65536
+Environment='STDOUT=/var/log/ttnlogger.log'
+Environment='STDERR=/var/log/ttnlogger.log'
+EnvironmentFile=-/etc/default/ttnlogger
+ExecStart=/bin/sh -c "/opt/ttnlogger/bin/ttnlogger >>${STDOUT} 2>>${STDERR}"
+KillMode=control-group
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+Alias=ttnlogger.service
