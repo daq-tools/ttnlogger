@@ -1,9 +1,9 @@
 {
-  "name": "TTN",
+  "name": "ttnlogger",
   "type": "influxdb",
   "url": "http://localhost:8086/",
   "access": "proxy",
-  "database": "ttn_testdrive",
+  "database": "ttnlogger",
   "user": "root",
   "password": "root"
 }

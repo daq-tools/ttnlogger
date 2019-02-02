@@ -21,7 +21,7 @@ extras = {
 
 setup(name='ttnlogger',
       version='0.0.0',
-      description='Receive MQTT from TTN and store to InfluxDB and MongoDB.',
+      description='Converge TTN messages into InfluxDB and MongoDB.',
       long_description=README,
       license="AGPL 3, EUPL 1.2",
       classifiers=[
@@ -53,7 +53,7 @@ setup(name='ttnlogger',
         ],
       author='Andreas Motl',
       author_email='andreas@hiveeyes.org',
-      url='https://git.cicer.de/autonome-zelle/mobile-zelle',
+      url='https://github.com/daq-tools/ttnlogger',
       keywords='data acquisition ' +
                'ttn mqtt mosquitto influxdb mongodb grafana',
       packages=find_packages(),
@@ -61,7 +61,7 @@ setup(name='ttnlogger',
       package_data={
       },
       zip_safe=False,
-      test_suite='luftdatenpumpe.test',
+      test_suite='ttnlogger.test',
       install_requires=requires,
       extras_require = extras,
       tests_require=extras['test'],
@@ -69,7 +69,7 @@ setup(name='ttnlogger',
       ],
       entry_points={
           'console_scripts': [
-              'ttnlogger = ttn_logger:run',
+              'ttnlogger = ttnlogger.ttn_logger:run',
           ],
       },
 )
