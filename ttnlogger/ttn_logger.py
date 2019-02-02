@@ -50,7 +50,6 @@ class TTNClient:
 
     def uplink_callback(self, msg, client):
       print("Received uplink from device", msg.dev_id)
-      #print(msg)
       if self.receive_callback is not None:
         self.receive_callback(message=msg, client=client)
 
@@ -59,23 +58,19 @@ class InfluxDatabase:
 
     def __init__(self, database=None):
         self.database = database
+        self.connect()
 
     def connect(self):
         self.client = InfluxDBClient('localhost', 8086, 'root', 'root', self.database)
         self.client.create_database(self.database)
 
     def store(self, ttn_message):
-        print('dev_id:', ttn_message.dev_id)
-        print('payload_fields:', ttn_message.payload_fields)
 
         name = ttn_message.dev_id + '_sensors'
         data = OrderedDict()
-        print(dir(ttn_message.payload_fields))
-        print()
 
         for field in ttn_message.payload_fields._fields:
             print('field:', field)
-            print('field:', dir(field))
             if field in ['raw', 'hexstring']: continue
             value = getattr(ttn_message.payload_fields, field)
             data[field] = value
