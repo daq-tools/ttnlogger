@@ -8,26 +8,18 @@ Plugins
 *******
 ::
 
+    # Get sources
     git clone https://github.com/pR0Ps/grafana-trackmap-panel
 
+    # Run build
     cd grafana-trackmap-panel
     npm install
     npm run build
 
-    ln -s `pwd` /usr/local/var/lib/grafana/plugins/
+    # Install as Grafana plugin
+    ln -s `pwd` /var/lib/grafana/plugins/
 
-
-::
-
-    git clone https://github.com/JamesOsgood/mongodb-grafana
-
-    cd mongodb-grafana
-    npm install
-    npm run server
-
-    ln -s `pwd` /usr/local/var/lib/grafana/plugins/
-
-List plugins::
+List all installed plugins::
 
     grafana-cli --pluginsDir=/usr/local/var/lib/grafana/plugins plugins ls
 
