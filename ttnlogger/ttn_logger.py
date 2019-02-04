@@ -9,6 +9,8 @@ import json
 from influxdb import InfluxDBClient
 from collections import OrderedDict
 
+from ttnlogger.util import convert_floats
+
 
 class TTNDatenpumpe:
 
@@ -92,6 +94,9 @@ class InfluxDatabase:
         data['gw_latitude'] = float(gw0.latitude)
         data['gw_longitude'] = float(gw0.longitude)
         data['gw_altitude'] = float(gw0.altitude)
+
+        # Convert all numeric values to floats.
+        data = convert_floats(data)
 
         # Add application and device id as tags.
         tags = OrderedDict()
