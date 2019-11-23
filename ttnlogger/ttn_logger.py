@@ -66,8 +66,13 @@ class TTNClient:
 
 class InfluxDatabase:
 
-    def __init__(self, database=None):
+    def __init__(self, database='ttnlogger', measurement='data'):
+
+        assert database, 'Database name missing or empty'
+        assert measurement, 'Measurement name missing or empty'
+
         self.database = database
+        self.measurement = measurement
         self.connect()
 
     def connect(self):
@@ -78,7 +83,7 @@ class InfluxDatabase:
 
         #print('ttn_message:', ttn_message)
 
-        name = 'data'
+        name = self.measurement
         data = OrderedDict()
 
         # Pick up telemetry values from main data payload.
@@ -114,11 +119,18 @@ class InfluxDatabase:
 
 
 def run():
-    app_id = os.getenv('TTN_APP_ID') or sys.argv[1]
-    access_key = os.getenv('TTN_ACCESS_KEY') or sys.argv[2]
+    try:
+        ttn_app_id = os.getenv('TTN_APP_ID') or sys.argv[1]
+        ttn_access_key = os.getenv('TTN_ACCESS_KEY') or sys.argv[2]
+        influxdb_database = os.getenv('INFLUXDB_DATABASE') or sys.argv[3]
+        influxdb_measurement = os.getenv('INFLUXDB_MEASUREMENT') or sys.argv[4]
 
-    ttn = TTNClient(app_id, access_key)
-    influxdb = InfluxDatabase('ttnlogger')
+    except IndexError:
+        print('ERROR: Missing arguments. Either provide them using '
+              'environment variables or as positional arguments.')
+
+    ttn = TTNClient(ttn_app_id, ttn_access_key)
+    influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
 
     datenpumpe = TTNDatenpumpe(ttn, influxdb)
     datenpumpe.enable()

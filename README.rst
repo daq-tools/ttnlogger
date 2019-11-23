@@ -14,20 +14,26 @@ TTN (`The Things Network`_) is building a global open LoRaWAN™ network.
 ********
 Synopsis
 ********
+The ``ttnlogger`` program can be invoked in two ways. Either it obtains four
+positional arguments on the command line or it obtains the four parameters
+from respective environment variables.
 
-Interactive
------------
+
+Command line arguments
+----------------------
 ::
 
-    ttnlogger "{app_id}" "{access_key}"
+    ttnlogger "<ttn_app_id>" "<ttn_access_key>" "<influxdb_database>" "<influxdb_measurement>"
 
 
-w/o arguments
--------------
+Environment variables
+---------------------
 ::
 
-    export TTN_APP_ID="{app_id}"
-    export TTN_ACCESS_KEY="{access_key}"
+    export TTN_APP_ID="testdrive"
+    export TTN_ACCESS_KEY="ttn-account-v2.UcOZ3_gRRVbzsJ1lR7WfuINLN_DKIlc9oKvgukHPGck"
+    export INFLUXDB_DATABASE="test"
+    export INFLUXDB_MEASUREMENT="data"
 
     ttnlogger
 
