@@ -29,7 +29,8 @@ class TTNDatenpumpe:
     def enable(self):
         self.ttn.receive_callback = self.on_receive
         while True:
-            time.sleep(2)
+            print('Connected:', self.ttn.connected)
+            time.sleep(5)
 
 
 class TTNClient:
@@ -38,24 +39,31 @@ class TTNClient:
         self.app_id = app_id
         self.access_key = access_key
         self.receive_callback = None
+        self.mqtt_client = None
+        self.connected = False
         self.connect()
 
     def connect(self):
         print('Connecting to TTN MQTT broker')
         handler = ttn.HandlerClient(self.app_id, self.access_key)
 
-        # using mqtt client
+        # Start MQTT client and wire event callbacks.
         mqtt_client = self.mqtt_client = handler.data()
+        mqtt_client._MQTTClient__client.enable_logger()
         mqtt_client.set_connect_callback(self.connect_callback)
+        mqtt_client.set_close_callback(self.disconnect_callback)
         mqtt_client.set_uplink_callback(self.uplink_callback)
         mqtt_client.connect()
-
-    def disconnect(self):
-        self.mqtt_client.close()
 
     def connect_callback(self, res, client):
         address = client._MQTTClient__mqtt_address
         print('Connected to MQTT broker at "{}"'.format(address))
+        self.connected = True
+
+    def disconnect_callback(self, res, client):
+        address = client._MQTTClient__mqtt_address
+        print('Disconnected from MQTT broker at "{}"'.format(address))
+        self.connected = False
 
     def uplink_callback(self, msg, client):
         print('-' * 63)
