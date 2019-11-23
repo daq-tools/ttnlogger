@@ -128,6 +128,7 @@ def run():
     except IndexError:
         print('ERROR: Missing arguments. Either provide them using '
               'environment variables or as positional arguments.')
+        sys.exit(1)
 
     ttn = TTNClient(ttn_app_id, ttn_access_key)
     influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
