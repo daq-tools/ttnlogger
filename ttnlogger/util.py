@@ -11,7 +11,7 @@ def convert_floats(data, integers=None):
     """
     integers = integers or []
     delete_keys = []
-    for key, value in data.iteritems():
+    for key, value in data.items():
         try:
             if isinstance(value, datetime.datetime):
                 continue
