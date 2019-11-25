@@ -16,11 +16,25 @@ class TTNDatenpumpe:
 
     def __init__(self, ttn=None, influxdb=None, mongodb=None):
         self.ttn = ttn
-        self.influxdb = influxdb
         self.mongodb = mongodb
 
     def on_receive(self, message=None, client=None):
         #print('on_receive:', message, client)
+
+        influxdb_env = message.dev_id.replace("-", "_").split("_")
+        influxdb_database = '_'.join(influxdb_env[:2])
+        influxdb_measurement = '_'.join(influxdb_env[2:])
+
+        #print('influxdb_database    :', influxdb_database)
+        #print('influxdb_measurement :', influxdb_measurement)
+
+        try:
+            del self.influxdb
+        except Exception as ex:
+            print('ERROR: Could not delete InfluxDB object', ex)
+
+        self.influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
+
         try:
             self.influxdb.store(message)
         except Exception as ex:
@@ -130,8 +144,6 @@ def run():
     try:
         ttn_app_id = os.getenv('TTN_APP_ID') or sys.argv[1]
         ttn_access_key = os.getenv('TTN_ACCESS_KEY') or sys.argv[2]
-        influxdb_database = os.getenv('INFLUXDB_DATABASE') or sys.argv[3]
-        influxdb_measurement = os.getenv('INFLUXDB_MEASUREMENT') or sys.argv[4]
 
     except IndexError:
         print('ERROR: Missing arguments. Either provide them using '
@@ -139,7 +151,6 @@ def run():
         sys.exit(1)
 
     ttn = TTNClient(ttn_app_id, ttn_access_key)
-    influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
 
-    datenpumpe = TTNDatenpumpe(ttn, influxdb)
+    datenpumpe = TTNDatenpumpe(ttn)
     datenpumpe.enable()
