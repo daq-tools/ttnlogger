@@ -28,17 +28,18 @@ class TTNDatenpumpe:
         #print('influxdb_database    :', influxdb_database)
         #print('influxdb_measurement :', influxdb_measurement)
 
-        try:
-            del self.influxdb
-        except Exception as ex:
-            print('ERROR: Could not delete InfluxDB object', ex)
-
         self.influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
 
         try:
             self.influxdb.store(message)
         except Exception as ex:
             print('ERROR:', ex)
+
+        try:
+            self.influxdb.close()
+            del self.influxdb
+        except Exception as ex:
+            print('ERROR: Could not delete InfluxDB object', ex)
 
     def enable(self):
         self.ttn.receive_callback = self.on_receive
