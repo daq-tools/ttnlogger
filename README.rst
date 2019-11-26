@@ -14,16 +14,23 @@ TTN (`The Things Network`_) is building a global open LoRaWAN™ network.
 ********
 Synopsis
 ********
-The ``ttnlogger`` program can be invoked in two ways. Either it obtains four
-positional arguments on the command line or it obtains the four parameters
-from respective environment variables.
+The ``ttnlogger`` program can be invoked in two ways. Either it obtains the TTN
+credentials as two positional arguments on the command line or it obtains the two
+parameters from respective environment variables.
 
+The InfluxDB agent database as well as the measurement are being derived from
+the TTN ``dev_id``. In case of using it within the Hiveeyes.org environment
+please follow this ``dev_id`` scheme:
+
+``hiveeyes-USER-LOCATION-NAMEOFHIVE``
+
+and replace upper case strings with your individual lower case namings without additional dashes)
 
 Command line arguments
 ----------------------
 ::
 
-    ttnlogger "<ttn_app_id>" "<ttn_access_key>" "<influxdb_database>" "<influxdb_measurement>"
+    ttnlogger "<ttn_app_id>" "<ttn_access_key>"
 
 
 Environment variables
@@ -32,8 +39,6 @@ Environment variables
 
     export TTN_APP_ID="testdrive"
     export TTN_ACCESS_KEY="ttn-account-v2.UcOZ3_gRRVbzsJ1lR7WfuINLN_DKIlc9oKvgukHPGck"
-    export INFLUXDB_DATABASE="test"
-    export INFLUXDB_MEASUREMENT="data"
 
     ttnlogger
 
