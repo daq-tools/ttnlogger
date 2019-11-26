@@ -21,7 +21,7 @@ class TTNDatenpumpe:
     def on_receive(self, message=None, client=None):
         #print('on_receive:', message, client)
 
-        influxdb_env = message.dev_id.replace("-", "_").split("_")
+        influxdb_env = message.dev_id.split('-')
         influxdb_database = '_'.join(influxdb_env[:2])
         influxdb_measurement = '_'.join(influxdb_env[2:])
 
