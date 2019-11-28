@@ -115,15 +115,21 @@ class InfluxDatabase:
             data[field] = value
 
         # Pick up telemetry values from gateway information.
-        gw0 = ttn_message.metadata.gateways[0]
-        data['gw_rssi'] = float(gw0.rssi)
-        data['gw_snr'] = float(gw0.snr)
-        data['gw_latitude'] = float(gw0.latitude)
-        data['gw_longitude'] = float(gw0.longitude)
-        data['gw_altitude'] = float(gw0.altitude)
+        num_gtws = len(ttn_message.metadata.gateways)
+        print('Message received from ' + str(num_gtws) + ' gateway(s)')
+
+        for i in range(num_gtws):
+            gtw_id = ttn_message.metadata.gateways[i].gtw_id
+            print('Gateway ' + str(i+1) + ' ID          : ' + gtw_id)
+            key_rssi = 'rssi_' + gtw_id
+            key_snr  = 'snr_' + gtw_id
+            data[key_rssi] = int(ttn_message.metadata.gateways[i].rssi)
+            data[key_snr] = float(ttn_message.metadata.gateways[i].snr)
+
+        data['gtw_count'] = int(num_gtws)
 
         # Convert all numeric values to floats.
-        data = convert_floats(data)
+        data = convert_floats(data, integers="gtw_count")
 
         # Add application and device id as tags.
         tags = OrderedDict()
