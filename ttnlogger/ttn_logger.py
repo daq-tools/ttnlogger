@@ -25,8 +25,8 @@ class TTNDatenpumpe:
         influxdb_database = '_'.join(influxdb_env[:2])
         influxdb_measurement = '_'.join(influxdb_env[2:])
 
-        #print('influxdb_database    :', influxdb_database)
-        #print('influxdb_measurement :', influxdb_measurement)
+        print('influxdb_database     :', influxdb_database)
+        print('influxdb_measurement  :', influxdb_measurement)
 
         self.influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
 
@@ -36,7 +36,6 @@ class TTNDatenpumpe:
             print('ERROR:', ex)
 
         try:
-            self.influxdb.close()
             del self.influxdb
         except Exception as ex:
             print('ERROR: Could not delete InfluxDB object', ex)
