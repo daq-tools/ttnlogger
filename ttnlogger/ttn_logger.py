@@ -121,8 +121,8 @@ class InfluxDatabase:
         for i in range(num_gtws):
             gtw_id = ttn_message.metadata.gateways[i].gtw_id
             print('Gateway ' + str(i+1) + ' ID          : ' + gtw_id)
-            key_rssi = 'rssi_' + gtw_id
-            key_snr  = 'snr_' + gtw_id
+            key_rssi = 'gw_' + gtw_id + '_rssi'
+            key_snr  = 'gw_' + gtw_id + '_snr'
             data[key_rssi] = int(ttn_message.metadata.gateways[i].rssi)
             data[key_snr] = float(ttn_message.metadata.gateways[i].snr)
 
