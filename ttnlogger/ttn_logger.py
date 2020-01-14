@@ -126,10 +126,13 @@ class InfluxDatabase:
             data[key_rssi] = int(ttn_message.metadata.gateways[i].rssi)
             data[key_snr] = float(ttn_message.metadata.gateways[i].snr)
 
+        data['sf'] = int(ttn_message.metadata.data_rate.split('BW')[0][2:])
+        data['bw'] = int(ttn_message.metadata.data_rate.split('BW')[1])
+
         data['gtw_count'] = int(num_gtws)
 
         # Convert all numeric values to floats.
-        data = convert_floats(data, integers="gtw_count")
+        data = convert_floats(data, integers="gtw_count,sf,bw")
 
         # Add application and device id as tags.
         tags = OrderedDict()
