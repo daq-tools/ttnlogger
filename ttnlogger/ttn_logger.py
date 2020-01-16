@@ -132,7 +132,7 @@ class InfluxDatabase:
         data['gtw_count'] = int(num_gtws)
 
         # Convert all numeric values to floats.
-        data = convert_floats(data, integers="gtw_count,sf,bw")
+        data = convert_floats(data, integers=["gtw_count", "sf", "bw"])
 
         # Add application and device id as tags.
         tags = OrderedDict()
