@@ -32,7 +32,7 @@ Command line arguments
 ----------------------
 ::
 
-    ttnlogger -i "<ttn_app_id>" -k "<ttn_access_key>" [-s] [-d <influxdb_database>] [-m <influxdb_measurement>]
+    ttnlogger -i "<ttn_app_id>" -k "<ttn_access_key>" [-s] [-d "<influxdb_database>"] [-m "<influxdb_measurement>"]
 
 
 Environment variables
