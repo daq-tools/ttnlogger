@@ -154,8 +154,8 @@ class InfluxDatabase:
 
 def run():
     parser = argparse.ArgumentParser(description='Subscribe to TTN MQTT topic and write data to InfluxDB')
-    parser.add_argument('-i', '--ttn_app_id', dest='ttn_app_id', action='store')
-    parser.add_argument('-k', '--ttn_access_key', dest='ttn_access_key', action='store')
+    parser.add_argument('-i', '--ttn_app_id', dest='ttn_app_id', action='store', required=True)
+    parser.add_argument('-k', '--ttn_access_key', dest='ttn_access_key', action='store', required=True)
     parser.add_argument('-s', '--split-topic', dest='split', action='store_true', default=False, help='Get InfluxDB database and measurement from MQTT topic split. If not set provide with --database and --measurement')
     parser.add_argument('-d', '--database', dest='influxdb_database', action='store', help='InfluxDB database')
     parser.add_argument('-m', '--measurement', dest='influxdb_measurement', action='store', help='InfluxDB measurement')
