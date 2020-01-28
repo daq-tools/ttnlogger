@@ -8,6 +8,7 @@ import time
 import json
 from influxdb import InfluxDBClient
 from collections import OrderedDict
+import argparse
 
 from ttnlogger.util import convert_floats
 
@@ -16,19 +17,21 @@ class TTNDatenpumpe:
 
     def __init__(self, ttn=None, influxdb=None, mongodb=None):
         self.ttn = ttn
+        self.influxdb = influxdb
         self.mongodb = mongodb
 
     def on_receive(self, message=None, client=None):
         #print('on_receive:', message, client)
 
-        influxdb_env = message.dev_id.split('-')
-        influxdb_database = '_'.join(influxdb_env[:2])
-        influxdb_measurement = '_'.join(influxdb_env[2:])
+        if self.influxdb is None:
+            influxdb_env = message.dev_id.split('-')
+            influxdb_database = '_'.join(influxdb_env[:2])
+            influxdb_measurement = '_'.join(influxdb_env[2:])
 
-        print('influxdb_database     :', influxdb_database)
-        print('influxdb_measurement  :', influxdb_measurement)
+            print('influxdb_database     :', influxdb_database)
+            print('influxdb_measurement  :', influxdb_measurement)
 
-        self.influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
+            self.influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
 
         try:
             self.influxdb.store(message)
@@ -150,16 +153,36 @@ class InfluxDatabase:
 
 
 def run():
-    try:
-        ttn_app_id = os.getenv('TTN_APP_ID') or sys.argv[1]
-        ttn_access_key = os.getenv('TTN_ACCESS_KEY') or sys.argv[2]
+    parser = argparse.ArgumentParser(description='Subscribe to TTN MQTT topic and write data to InfluxDB')
+    parser.add_argument('-i', '--ttn_app_id', dest='ttn_app_id', action='store')
+    parser.add_argument('-k', '--ttn_access_key', dest='ttn_access_key', action='store')
+    parser.add_argument('-s', '--split-topic', dest='split', action='store_true', default=False, help='Get InfluxDB database and measurement from MQTT topic split. If not set provide with --database and --measurement')
+    parser.add_argument('-d', '--database', dest='influxdb_database', action='store', help='InfluxDB database')
+    parser.add_argument('-m', '--measurement', dest='influxdb_measurement', action='store', help='InfluxDB measurement')
 
-    except IndexError:
-        print('ERROR: Missing arguments. Either provide them using '
-              'environment variables or as positional arguments.')
+    options = parser.parse_args()
+
+    ttn_app_id = os.getenv('TTN_APP_ID') or options.ttn_app_id
+    ttn_access_key = os.getenv('TTN_ACCESS_KEY') or options.ttn_access_key
+    influxdb_database = os.getenv('INFLUXDB_DATABASE') or options.influxdb_database
+    influxdb_measurement = os.getenv('INFLUXDB_MEASUREMENT') or options.influxdb_measurement
+
+    # print('TTN_APP_ID     : ', ttn_app_id)
+    # print('TTN_ACCESS_KEY : ', ttn_access_key)
+    # print('Split topic    : ', options.split)
+    # print('InfluxDB DB    : ', influxdb_database)
+    # print('InfluxDB MEAS  : ', influxdb_measurement)
+
+    if options.split is False and ( influxdb_database is None or influxdb_measurement is None ):
+        parser.error('Missing -s requires --database and --measurement options. See -h for help.')
         sys.exit(1)
 
-    ttn = TTNClient(ttn_app_id, ttn_access_key)
+    if options.split is True:
+        ttn = TTNClient(ttn_app_id, ttn_access_key)
+        datenpumpe = TTNDatenpumpe(ttn)
+    else:
+        ttn = TTNClient(ttn_app_id, ttn_access_key)
+        influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
+        datenpumpe = TTNDatenpumpe(ttn, influxdb)
 
-    datenpumpe = TTNDatenpumpe(ttn)
     datenpumpe.enable()
