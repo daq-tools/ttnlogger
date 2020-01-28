@@ -26,6 +26,8 @@ In case of using it within the Hiveeyes.org environment please follow this schem
 
 and replace upper case strings with your individual lower case namings without additional dashes)
 
+The ``-n`` option disables saving geolocations of receiving gateways into the database.
+
 Command line arguments
 ----------------------
 ::

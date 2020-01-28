@@ -15,10 +15,11 @@ from ttnlogger.util import convert_floats
 
 class TTNDatenpumpe:
 
-    def __init__(self, ttn=None, influxdb=None, mongodb=None):
+    def __init__(self, ttn=None, influxdb=None, mongodb=None, nogeo=False):
         self.ttn = ttn
         self.influxdb = influxdb
         self.mongodb = mongodb
+        self.nogeo = nogeo
 
     def on_receive(self, message=None, client=None):
         #print('on_receive:', message, client)
@@ -31,7 +32,7 @@ class TTNDatenpumpe:
             print('influxdb_database     :', influxdb_database)
             print('influxdb_measurement  :', influxdb_measurement)
 
-            self.influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
+            self.influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement, nogeo=self.nogeo)
 
         try:
             self.influxdb.store(message)
@@ -91,13 +92,14 @@ class TTNClient:
 
 class InfluxDatabase:
 
-    def __init__(self, database='ttnlogger', measurement='data'):
+    def __init__(self, database='ttnlogger', measurement='data', nogeo=False):
 
         assert database, 'Database name missing or empty'
         assert measurement, 'Measurement name missing or empty'
 
         self.database = database
         self.measurement = measurement
+        self.nogeo = nogeo
         self.connect()
 
     def connect(self):
@@ -124,10 +126,20 @@ class InfluxDatabase:
         for i in range(num_gtws):
             gtw_id = ttn_message.metadata.gateways[i].gtw_id
             print('Gateway ' + str(i+1) + ' ID          : ' + gtw_id)
+
+            # signal quality
             key_rssi = 'gw_' + gtw_id + '_rssi'
             key_snr  = 'gw_' + gtw_id + '_snr'
             data[key_rssi] = int(ttn_message.metadata.gateways[i].rssi)
-            data[key_snr] = float(ttn_message.metadata.gateways[i].snr)
+            data[key_snr]  = float(ttn_message.metadata.gateways[i].snr)
+
+            # gateway location
+            if not self.nogeo:
+                key_lon  = 'gw_' + gtw_id + '_lon'
+                key_alt  = 'gw_' + gtw_id + '_alt'
+                data[key_lat] = float(ttn_message.metadata.gateways[i].latitude)
+                data[key_lon] = float(ttn_message.metadata.gateways[i].longitude)
+                data[key_alt] = float(ttn_message.metadata.gateways[i].altitude)
 
         data['sf'] = int(ttn_message.metadata.data_rate.split('BW')[0][2:])
         data['bw'] = int(ttn_message.metadata.data_rate.split('BW')[1])
@@ -159,6 +171,7 @@ def run():
     parser.add_argument('-s', '--split-topic', dest='split', action='store_true', default=False, help='Get InfluxDB database and measurement from MQTT topic split. If not set provide with --database and --measurement')
     parser.add_argument('-d', '--database', dest='influxdb_database', action='store', help='InfluxDB database')
     parser.add_argument('-m', '--measurement', dest='influxdb_measurement', action='store', help='InfluxDB measurement')
+    parser.add_argument('-n', '--no-gw-location', dest='nogeo', action='store_true', default=False, help='Discard geolocation of receiving gateways. Default is False')
 
     options = parser.parse_args()
 
@@ -172,6 +185,7 @@ def run():
     # print('Split topic    : ', options.split)
     # print('InfluxDB DB    : ', influxdb_database)
     # print('InfluxDB MEAS  : ', influxdb_measurement)
+    # print('GW LOC         : ', options.nogeo)
 
     if options.split is False and ( influxdb_database is None or influxdb_measurement is None ):
         parser.error('Missing -s requires --database and --measurement options. See -h for help.')
@@ -180,9 +194,9 @@ def run():
     ttn = TTNClient(ttn_app_id, ttn_access_key)
 
     if options.split is True:
-        datenpumpe = TTNDatenpumpe(ttn)
+        datenpumpe = TTNDatenpumpe(ttn, nogeo=options.nogeo)
     else:
-        influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
+        influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement, nogeo=options.nogeo)
         datenpumpe = TTNDatenpumpe(ttn, influxdb)
 
     datenpumpe.enable()
