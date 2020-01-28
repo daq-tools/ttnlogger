@@ -14,16 +14,25 @@ TTN (`The Things Network`_) is building a global open LoRaWAN™ network.
 ********
 Synopsis
 ********
-The ``ttnlogger`` program can be invoked in two ways. Either it obtains four
-positional arguments on the command line or it obtains the four parameters
-from respective environment variables.
+The ``ttnlogger`` program can be invoked in two ways. Either it obtains the TTN
+credentials as well as InfluxDB database and measurement as four command-line options
+or it obtains the parameters from respective environment variables.
 
+With the ``-s`` option the InfluxDB agent database as well as the measurement are being
+derived from the TTN ``dev_id`` while ``-d`` and ``-m`` are being ignored.
+In case of using it within the Hiveeyes.org environment please follow this scheme for the ``dev_id``:
+
+``hiveeyes-USER-LOCATION-NAMEOFHIVE``
+
+and replace upper case strings with your individual lower case namings without additional dashes)
+
+The ``-n`` option disables saving geolocations of receiving gateways into the database.
 
 Command line arguments
 ----------------------
 ::
 
-    ttnlogger "<ttn_app_id>" "<ttn_access_key>" "<influxdb_database>" "<influxdb_measurement>"
+    ttnlogger -i "<ttn_app_id>" -k "<ttn_access_key>" [-s] [-d "<influxdb_database>"] [-m "<influxdb_measurement>"]
 
 
 Environment variables
@@ -34,7 +43,6 @@ Environment variables
     export TTN_ACCESS_KEY="ttn-account-v2.UcOZ3_gRRVbzsJ1lR7WfuINLN_DKIlc9oKvgukHPGck"
     export INFLUXDB_DATABASE="test"
     export INFLUXDB_MEASUREMENT="data"
-
     ttnlogger
 
 
@@ -49,7 +57,7 @@ Setup
     python setup.py develop
 
 
-Run as systemd unit::
+Run as systemd unit ()::
 
     cp etc/default/ttnlogger /etc/default/
     ln -sr etc/systemd/ttnlogger.service /usr/lib/systemd/system/
