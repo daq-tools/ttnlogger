@@ -135,6 +135,7 @@ class InfluxDatabase:
 
             # gateway location
             if not self.nogeo:
+                key_lat  = 'gw_' + gtw_id + '_lat'
                 key_lon  = 'gw_' + gtw_id + '_lon'
                 key_alt  = 'gw_' + gtw_id + '_alt'
                 data[key_lat] = float(ttn_message.metadata.gateways[i].latitude)
