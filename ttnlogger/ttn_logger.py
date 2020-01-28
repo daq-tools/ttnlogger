@@ -177,11 +177,11 @@ def run():
         parser.error('Missing -s requires --database and --measurement options. See -h for help.')
         sys.exit(1)
 
+    ttn = TTNClient(ttn_app_id, ttn_access_key)
+
     if options.split is True:
-        ttn = TTNClient(ttn_app_id, ttn_access_key)
         datenpumpe = TTNDatenpumpe(ttn)
     else:
-        ttn = TTNClient(ttn_app_id, ttn_access_key)
         influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement)
         datenpumpe = TTNDatenpumpe(ttn, influxdb)
 
