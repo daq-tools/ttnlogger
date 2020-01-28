@@ -15,16 +15,17 @@ from ttnlogger.util import convert_floats
 
 class TTNDatenpumpe:
 
-    def __init__(self, ttn=None, influxdb=None, mongodb=None, nogeo=False):
+    def __init__(self, ttn=None, influxdb=None, mongodb=None, nogeo=False, split=False):
         self.ttn = ttn
         self.influxdb = influxdb
         self.mongodb = mongodb
+        self.split = split
         self.nogeo = nogeo
 
     def on_receive(self, message=None, client=None):
         #print('on_receive:', message, client)
 
-        if self.influxdb is None:
+        if self.split:
             influxdb_env = message.dev_id.split('-')
             influxdb_database = '_'.join(influxdb_env[:2])
             influxdb_measurement = '_'.join(influxdb_env[2:])
@@ -38,11 +39,6 @@ class TTNDatenpumpe:
             self.influxdb.store(message)
         except Exception as ex:
             print('ERROR:', ex)
-
-        try:
-            del self.influxdb
-        except Exception as ex:
-            print('ERROR: Could not delete InfluxDB object', ex)
 
     def enable(self):
         self.ttn.receive_callback = self.on_receive
@@ -186,18 +182,18 @@ def run():
     # print('Split topic    : ', options.split)
     # print('InfluxDB DB    : ', influxdb_database)
     # print('InfluxDB MEAS  : ', influxdb_measurement)
-    # print('GW LOC         : ', options.nogeo)
+    # print('NO GW LOC      : ', options.nogeo)
 
-    if options.split is False and ( influxdb_database is None or influxdb_measurement is None ):
+    if not options.split and ( influxdb_database is None or influxdb_measurement is None ):
         parser.error('Missing -s requires --database and --measurement options. See -h for help.')
         sys.exit(1)
 
     ttn = TTNClient(ttn_app_id, ttn_access_key)
 
-    if options.split is True:
-        datenpumpe = TTNDatenpumpe(ttn, nogeo=options.nogeo)
+    if options.split:
+        datenpumpe = TTNDatenpumpe(ttn, nogeo=options.nogeo, split=True)
     else:
         influxdb = InfluxDatabase(database=influxdb_database, measurement=influxdb_measurement, nogeo=options.nogeo)
-        datenpumpe = TTNDatenpumpe(ttn, influxdb)
+        datenpumpe = TTNDatenpumpe(ttn, influxdb, nogeo=options.nogeo, split=False)
 
     datenpumpe.enable()

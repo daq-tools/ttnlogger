@@ -20,7 +20,7 @@ extras = {
 }
 
 setup(name='ttnlogger',
-      version='0.2.0',
+      version='0.2.1',
       description='Converge TTN messages into InfluxDB and MongoDB and display in Grafana',
       long_description=README,
       license="AGPL 3, EUPL 1.2",
